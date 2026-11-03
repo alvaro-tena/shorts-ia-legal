@@ -30,18 +30,28 @@
 </ul>
 <p>No lee comentarios, estadísticas, suscriptores ni ningún otro dato del canal o de otros usuarios.</p>
 
-<h2>4. Dónde se guardan y con quién se comparten</h2>
-<p>Los datos se guardan solo en el ordenador del propietario: el token en <code>credenciales/youtube.json</code> y el historial en <code>historial.csv</code>. No hay servidores propios.</p>
+<h2>4. Uso de las API de TikTok</h2>
+<p>shorts-ia usa <strong>Login Kit</strong> y la <strong>Content Posting API</strong> de TikTok (Direct Post). Al autorizar la app aceptas las <a href="https://www.tiktok.com/legal/page/global/terms-of-service/en">Condiciones del Servicio de TikTok</a> y su <a href="https://www.tiktok.com/legal/page/global/privacy-policy/en">Política de Privacidad</a>.</p>
+<ul>
+  <li><strong>Permiso</strong> <code>user.info.basic</code>: nombre visible, usuario y foto del creador, para mostrar en qué cuenta se va a publicar.</li>
+  <li><strong>Permiso</strong> <code>video.publish</code>: publicar en la cuenta del creador los vídeos que él aprueba uno a uno en el panel local, con la privacidad e interacciones que elige.</li>
+  <li><strong>Token de actualización OAuth e identificador abierto (open_id)</strong>: para publicar sin volver a iniciar sesión.</li>
+  <li><strong>Identificador y estado de la publicación</strong>: para confirmar que el vídeo se ha publicado.</li>
+</ul>
+<p>No lee vídeos, comentarios, seguidores, mensajes ni datos de otros usuarios.</p>
+
+<h2>5. Dónde se guardan y con quién se comparten</h2>
+<p>Los datos se guardan solo en el ordenador del propietario: los tokens en <code>credenciales/youtube.json</code> y <code>credenciales/tiktok.json</code> y el historial en <code>historial.csv</code>. No hay servidores propios.</p>
 <p>No se venden, ceden ni comparten con terceros. No se usan cookies, analítica ni publicidad.</p>
 
-<h2>5. Revocar el acceso</h2>
-<p>Puedes retirar el acceso en cualquier momento desde la página de permisos de seguridad de Google: <a href="https://security.google.com/settings/security/permissions">security.google.com/settings/security/permissions</a>. A partir de ese momento shorts-ia no puede subir nada.</p>
+<h2>6. Revocar el acceso</h2>
+<p>Puedes retirar el acceso en cualquier momento desde la página de permisos de seguridad de Google: <a href="https://security.google.com/settings/security/permissions">security.google.com/settings/security/permissions</a>. En TikTok: <em>Ajustes y privacidad &gt; Seguridad &gt; Permisos de apps</em>. A partir de ese momento shorts-ia no puede subir nada.</p>
 
-<h2>6. Eliminación de datos</h2>
+<h2>7. Eliminación de datos</h2>
 <p>Al revocar el acceso, o si lo pides abriendo una incidencia, el token y el historial se borran del ordenador en un máximo de 7 días.</p>
-<p>Los vídeos locales se borran automáticamente en cuanto YouTube confirma la publicación.</p>
+<p>Los vídeos locales se borran automáticamente en cuanto cada plataforma confirma la publicación.</p>
 
-<h2>7. Contacto</h2>
+<h2>8. Contacto</h2>
 <p><a href="https://github.com/alvaro-tena/shorts-ia-legal/issues">Abre una incidencia en GitHub</a>.</p>
 </body>
 </html>
