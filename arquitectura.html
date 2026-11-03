@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura · shorts-ia</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<h1>Arquitectura de shorts-ia</h1>
+<div class="diagrama">
+  <div class="fila">
+    <div class="caja local"><strong>Ordenador del propietario (Windows)</strong><br>Todo se ejecuta en local; no hay servidor propio.</div>
+  </div>
+  <div class="fila">
+    <div class="caja local"><strong>pipeline.py</strong><br>Genera el vídeo, asigna la hora de publicación y guarda la cola en <code>cola/</code>.</div>
+    <div class="caja local"><strong>Programador de tareas de Windows</strong><br>Ejecuta <code>publicar-ahora</code> a cada hora programada.</div>
+  </div>
+  <div class="flecha">↓</div>
+  <div class="fila">
+    <div class="caja local"><strong>redes.py</strong><br>Publicador oficial: obtiene un token de acceso con el token de actualización guardado en <code>credenciales/youtube.json</code>.</div>
+  </div>
+  <div class="flecha">↓ HTTPS · OAuth 2.0 (permiso <code>youtube.upload</code>)</div>
+  <div class="fila">
+    <div class="caja yt-caja"><strong>YouTube Data API v3</strong><br><code>videos.insert</code> (subida reanudable) con <code>privacyStatus=private</code> + <code>publishAt</code>.</div>
+  </div>
+  <div class="flecha">↓</div>
+  <div class="fila">
+    <div class="caja yt-caja"><strong>Canal clipsNovelas</strong><br>YouTube publica el Short a la hora indicada.</div>
+  </div>
+  <div class="flecha">↓ id del vídeo</div>
+  <div class="fila">
+    <div class="caja local"><strong>historial.csv</strong><br>Guarda el id y la URL. El vídeo local se borra al confirmarse la publicación.</div>
+  </div>
+</div>
+</body>
+</html>

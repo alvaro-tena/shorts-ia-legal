@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subida · shorts-ia</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<h1>Interfaz de subida</h1>
+<p>shorts-ia es una herramienta de línea de comandos y no tiene interfaz web. El propietario la usa así.</p>
+
+<h2>Comandos</h2>
+<pre>uv run pipeline.py conectar youtube frutinovela   # autorización OAuth (una vez)
+uv run pipeline.py slots 3                        # próximas horas de publicación
+uv run pipeline.py publicar-ahora                 # sube lo que toca (la tarea programada lo ejecuta sola)</pre>
+
+<h2>Ejemplo de registro de una subida</h2>
+<pre>[20:58:02] frutinovela_001: youtube -> videos.insert (privacyStatus=private, publishAt=2026-11-03T20:00:00Z)
+[20:58:41] subida reanudable completada: 71.0 s, 38 MB
+[20:58:41] programado: https://youtube.com/shorts/&lt;id&gt;
+[20:58:41] historial.csv actualizado; copia local borrada</pre>
+
+<h2>Código</h2>
+<p>El script completo de subida (<code>redes.py</code>) está adjunto a la solicitud de auditoría. Usa la subida reanudable de <code>videos.insert</code> con un token OAuth del propio propietario.</p>
+<p><a href="index.html">← shorts-ia</a></p>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flujo de usuario · shorts-ia</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<h1>Flujo de usuario</h1>
+<p>Único usuario: el propietario del canal.</p>
+
+<h2>A. Autorización (una sola vez)</h2>
+<div class="paso">1. El propietario ejecuta <code>uv run pipeline.py conectar youtube frutinovela</code>.</div>
+<div class="paso">2. Se abre la pantalla de consentimiento de Google de la app <strong>shorts-ia</strong>, que pide solo el permiso <code>youtube.upload</code>.</div>
+<div class="paso">3. El propietario elige su cuenta y su canal y pulsa <strong>Permitir</strong>.</div>
+<div class="paso">4. Google redirige a <code>http://127.0.0.1</code>. El token de actualización se guarda solo en local (<code>credenciales/youtube.json</code>).</div>
+
+<h2>B. Publicación diaria (automática)</h2>
+<div class="paso">5. Al encender el PC, el propietario genera sus vídeos y les asigna una hora de publicación.</div>
+<div class="paso">6. shorts-ia llama a <code>videos.insert</code> con título, descripción, <code>privacyStatus=private</code> y <code>publishAt</code>.</div>
+<div class="paso">7. YouTube devuelve el id del vídeo. Se anota en <code>historial.csv</code> y se borra la copia local.</div>
+<div class="paso">8. A la hora indicada, YouTube publica el Short en el canal.</div>
+
+<h2>C. Revocación</h2>
+<div class="paso">9. El propietario retira el acceso en <a href="https://security.google.com/settings/security/permissions">security.google.com/settings/security/permissions</a>. A partir de ahí shorts-ia no puede subir nada, y el token local se borra.</div>
+</body>
+</html>

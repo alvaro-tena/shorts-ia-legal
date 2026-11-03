@@ -1,0 +1,189 @@
+"""Publicación por APIs oficiales (gratis). Credenciales en credenciales/<plataforma>.json, una entrada por serie.
+
+  meta.json    {"<serie>": {"page_id", "page_token", "ig_id"}}          <- pipeline.py conectar meta
+  youtube.json {"cliente": {...client_secret...}, "<serie>": {"refresh_token"}, "auditado": false}
+                                                                        <- pipeline.py conectar youtube <serie>
+TikTok: pendiente de la auditoría de Content Posting API; mientras tanto va a pendiente_manual.csv.
+"""
+import datetime as dt
+import json
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from pathlib import Path
+
+CRED = Path(__file__).resolve().parent / "credenciales"
+GRAPH = "https://graph.facebook.com/v26.0"
+RUPLOAD = "https://rupload.facebook.com"
+
+
+def http(metodo, url, cabeceras=None, datos=None):
+    """Devuelve (json, cabeceras). Se sustituye en el test para no tocar la red."""
+    req = urllib.request.Request(url, data=datos, method=metodo, headers=cabeceras or {})
+    try:
+        with urllib.request.urlopen(req, timeout=600) as r:
+            cuerpo = r.read()
+            return (json.loads(cuerpo) if cuerpo else {}), dict(r.headers)
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"{metodo} {url.split('?')[0]} -> {e.code}: {e.read().decode(errors='replace')[:800]}")
+
+
+def cred(plataforma):
+    f = CRED / f"{plataforma}.json"
+    return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+
+
+def guardar_cred(plataforma, datos):
+    CRED.mkdir(exist_ok=True)
+    (CRED / f"{plataforma}.json").write_text(json.dumps(datos, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def texto(m):
+    return f"{m['caption']}\n\n{' '.join(m['hashtags'])}"
+
+
+def q(**kw):
+    return urllib.parse.urlencode(kw)
+
+
+# ---------- Facebook Page (Reels): se sube ya y Facebook lo publica a su hora ----------
+
+def publicar_facebook(d, m, p):
+    c = cred("meta")[m["serie"]]
+    tok, pagina = c["page_token"], c["page_id"]
+    video = Path(d) / "final.mp4"
+    inicio, _ = http("POST", f"{GRAPH}/{pagina}/video_reels?{q(upload_phase='start', access_token=tok)}")
+    vid = inicio["video_id"]
+    http("POST", f"{RUPLOAD}/video-upload/v26.0/{vid}",
+         {"Authorization": f"OAuth {tok}", "offset": "0", "file_size": str(video.stat().st_size)}, video.read_bytes())
+    slot = dt.datetime.fromisoformat(p["slot"])
+    programar = slot - dt.datetime.now(dt.timezone.utc) > dt.timedelta(minutes=15)  # FB exige >= 10 min
+    extra = {"video_state": "SCHEDULED", "scheduled_publish_time": int(slot.timestamp())} if programar \
+        else {"video_state": "PUBLISHED"}
+    http("POST", f"{GRAPH}/{pagina}/video_reels?" + q(upload_phase="finish", video_id=vid, description=texto(m),
+                                                      access_token=tok, **extra))
+    return {"estado": "programado" if programar else "publicado", "post_id": vid,
+            "url": f"https://www.facebook.com/reel/{vid}"}
+
+
+# ---------- Instagram Reels: no admite programar, se publica a la hora del slot ----------
+
+def publicar_instagram(d, m, p):
+    c = cred("meta")[m["serie"]]
+    tok, ig = c["page_token"], c["ig_id"]
+    video = Path(d) / "final.mp4"
+    cont, _ = http("POST", f"{GRAPH}/{ig}/media?" + q(media_type="REELS", upload_type="resumable", caption=texto(m),
+                                                      share_to_feed="true", access_token=tok))
+    http("POST", f"{RUPLOAD}/ig-api-upload/v26.0/{cont['id']}",
+         {"Authorization": f"OAuth {tok}", "offset": "0", "file_size": str(video.stat().st_size)}, video.read_bytes())
+    for _ in range(120):  # Instagram procesa el vídeo antes de dejar publicarlo
+        estado, _ = http("GET", f"{GRAPH}/{cont['id']}?" + q(fields="status_code", access_token=tok))
+        if estado.get("status_code") == "FINISHED":
+            break
+        if estado.get("status_code") in ("ERROR", "EXPIRED"):
+            raise RuntimeError(f"Instagram rechazó el vídeo: {estado}")
+        time.sleep(5)
+    else:
+        raise TimeoutError("Instagram no terminó de procesar el vídeo en 10 min")
+    pub, _ = http("POST", f"{GRAPH}/{ig}/media_publish?" + q(creation_id=cont["id"], access_token=tok))
+    link, _ = http("GET", f"{GRAPH}/{pub['id']}?" + q(fields="permalink", access_token=tok))
+    return {"estado": "publicado", "post_id": pub["id"], "url": link.get("permalink", "")}
+
+
+# ---------- YouTube Shorts: se sube ya con publishAt (solo sirve con el proyecto auditado) ----------
+
+def token_google(c, refresh):
+    r, _ = http("POST", "https://oauth2.googleapis.com/token", {"Content-Type": "application/x-www-form-urlencoded"},
+                q(client_id=c["client_id"], client_secret=c["client_secret"], refresh_token=refresh,
+                  grant_type="refresh_token").encode())
+    return r["access_token"]
+
+
+def publicar_youtube(d, m, p):
+    y = cred("youtube")
+    tok = token_google(y["cliente"], y[m["serie"]]["refresh_token"])
+    video = Path(d) / "final.mp4"
+    arco = m.get("arco") or {}
+    titulo = f"{arco['titulo']} (Parte {arco['parte']})" if arco.get("total", 1) > 1 else m["titulo"]
+    slot = dt.datetime.fromisoformat(p["slot"])
+    # YouTube exige declarar lo sintético que parece real (sabías que: 3D realista); la animación evidente no
+    estado = {"privacyStatus": "private", "selfDeclaredMadeForKids": False,
+              "containsSyntheticMedia": m["formato"] == "sabiasque"}
+    if slot > dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=5):
+        estado["publishAt"] = slot.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    else:
+        estado["privacyStatus"] = "public"
+    meta = {"snippet": {"title": f"{titulo[:88]} #Shorts", "description": texto(m), "defaultLanguage": "es",
+                        "tags": [h.lstrip("#") for h in m["hashtags"]],
+                        "categoryId": "27" if m["formato"] == "sabiasque" else "24"},
+            "status": estado}
+    _, cab = http("POST", "https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status",
+                  {"Authorization": f"Bearer {tok}", "Content-Type": "application/json; charset=UTF-8",
+                   "X-Upload-Content-Type": "video/mp4", "X-Upload-Content-Length": str(video.stat().st_size)},
+                  json.dumps(meta).encode())
+    sesion = next(v for k, v in cab.items() if k.lower() == "location")
+    r, _ = http("PUT", sesion, {"Authorization": f"Bearer {tok}", "Content-Type": "video/mp4"}, video.read_bytes())
+    return {"estado": "programado" if "publishAt" in estado else "publicado", "post_id": r["id"],
+            "url": f"https://youtube.com/shorts/{r['id']}"}
+
+
+def publicador(plataforma, serie):
+    """La función de publicación si esa serie tiene la plataforma conectada; si no, None (va a la lista manual)."""
+    if plataforma in ("facebook", "instagram"):
+        c = cred("meta").get(serie, {})
+        clave = "page_id" if plataforma == "facebook" else "ig_id"
+        return (publicar_facebook if plataforma == "facebook" else publicar_instagram) if c.get(clave) else None
+    if plataforma == "youtube":
+        y = cred("youtube")
+        return publicar_youtube if y.get("auditado") and serie in y else None
+    return None  # tiktok: hasta aprobar la auditoría
+
+
+def selftest():
+    """Simula la red y comprueba el orden de llamadas de cada flujo."""
+    import tempfile
+    global http, cred
+    llamadas, real_http, real_cred = [], http, cred
+
+    def falso(metodo, url, cabeceras=None, datos=None):
+        llamadas.append((metodo, url.split("?")[0]))
+        if "video_reels" in url and "start" in url:
+            return {"video_id": "V1"}, {}
+        if url.endswith("/media") or "/media?" in url:
+            return {"id": "C1"}, {}
+        if "status_code" in url:
+            return {"status_code": "FINISHED"}, {}
+        if "media_publish" in url:
+            return {"id": "M1"}, {}
+        if "permalink" in url:
+            return {"permalink": "https://instagram.com/reel/x"}, {}
+        if "oauth2" in url:
+            return {"access_token": "T"}, {}
+        if "uploadType=resumable" in url:
+            return {}, {"Location": "https://upload/sesion"}
+        if metodo == "PUT":
+            return {"id": "Y1"}, {}
+        return {"success": True}, {}
+
+    http = falso
+    cred = lambda pl: {"meta": {"s": {"page_id": "P", "page_token": "T", "ig_id": "IG"}},
+                       "youtube": {"cliente": {"client_id": "a", "client_secret": "b"}, "s": {"refresh_token": "r"},
+                                   "auditado": True}}[pl]
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "final.mp4").write_bytes(b"x" * 10)
+            m = {"serie": "s", "formato": "sabiasque", "titulo": "t", "caption": "c", "hashtags": ["#a"],
+                 "arco": {"titulo": "Arco", "parte": 1, "total": 2}}
+            futuro = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=5)).isoformat()
+            assert publicar_facebook(d, m, {"slot": futuro}) == {
+                "estado": "programado", "post_id": "V1", "url": "https://www.facebook.com/reel/V1"}
+            assert [u for _, u in llamadas][-3:] == [f"{GRAPH}/P/video_reels", f"{RUPLOAD}/video-upload/v26.0/V1",
+                                                     f"{GRAPH}/P/video_reels"]
+            assert publicar_instagram(d, m, {"slot": futuro})["post_id"] == "M1"
+            assert publicar_youtube(d, m, {"slot": futuro})["estado"] == "programado"
+            assert llamadas[-1] == ("PUT", "https://upload/sesion")
+            assert publicador("facebook", "s") and publicador("youtube", "s") and not publicador("tiktok", "s")
+            assert not publicador("instagram", "otra")
+    finally:
+        http, cred = real_http, real_cred
