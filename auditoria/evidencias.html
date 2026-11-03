@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>shorts-ia · Pruebas de cumplimiento (proyecto 860669100677)</title>
+<style>
+  body { font-family: "Segoe UI", system-ui, sans-serif; color: #1d1d1f; margin: 0; }
+  section { page-break-after: always; padding: 28px 36px; }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  h2 { font-size: 17px; margin: 0 0 10px; }
+  p, li { font-size: 13px; line-height: 1.5; }
+  img { width: 100%; border: 1px solid #ccc; }
+</style>
+</head>
+<body>
+<section>
+  <h1>shorts-ia: pruebas de cumplimiento</h1>
+  <p>Proyecto de Google Cloud <b>860669100677</b> (shorts-ia-513521). Canal: <b>clipsNovelas</b> (UCcdmXvex99E-Qj5gb4pYa9A). Web: https://alvaro-tena.github.io/shorts-ia-legal/</p>
+  <h2>1. Página principal</h2>
+  <p>Enlace visible a la Política de Privacidad, mención "Desarrollado con YouTube" y enlaces a las Condiciones de YouTube y a la Política de Privacidad de Google.</p>
+  <img src="portada.png">
+</section>
+<section>
+  <h2>2. Política de privacidad</h2>
+  <p>Incluye: uso de los servicios de API de YouTube (sección 2), enlace a la Política de Privacidad de Google y a las Condiciones de YouTube, datos accedidos (sección 3), almacenamiento local y no compartición (sección 4), revocación en security.google.com/settings/security/permissions (sección 5) y eliminación de datos en un máximo de 7 días (sección 6).</p>
+  <img src="privacidad.png">
+</section>
+<section>
+  <h2>3. Condiciones del servicio</h2>
+  <img src="condiciones.png">
+</section>
+<section>
+  <h2>4. Flujo OAuth</h2>
+  <ul>
+    <li><b>Consentimiento:</b> la app "shorts-ia" pide solo el permiso <code>https://www.googleapis.com/auth/youtube.upload</code> (cliente OAuth de escritorio, PKCE, redirección a 127.0.0.1).</li>
+    <li><b>Permisos:</b> solo subir vídeos al canal del propietario. No lee estadísticas, comentarios ni datos de otros usuarios.</li>
+    <li><b>Revocación:</b> desde security.google.com/settings/security/permissions. Al revocar, el token local se borra.</li>
+  </ul>
+  <p>Detalle paso a paso en el diagrama de flujo de usuario adjunto.</p>
+  <h2>5. Interfaz de subida</h2>
+  <p>Herramienta de línea de comandos, sin interfaz web. El script completo de subida (redes.py) va adjunto en "Otros materiales de apoyo".</p>
+  <img src="subida.png">
+</section>
+</body>
+</html>
