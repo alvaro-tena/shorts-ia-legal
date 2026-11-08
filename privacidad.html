@@ -40,18 +40,28 @@
 </ul>
 <p>No lee vídeos, comentarios, seguidores, mensajes ni datos de otros usuarios.</p>
 
-<h2>5. Dónde se guardan y con quién se comparten</h2>
-<p>Los datos se guardan solo en el ordenador del propietario: los tokens en <code>credenciales/youtube.json</code> y <code>credenciales/tiktok.json</code> y el historial en <code>historial.csv</code>. No hay servidores propios.</p>
+<h2>5. Uso de las API de Meta (Facebook e Instagram)</h2>
+<p>shorts-ia usa la API de páginas de Facebook y la API de Instagram para publicar los vídeos del propietario en su propia página y su propia cuenta de Instagram. Solo se usan las cuentas del propietario de la herramienta.</p>
+<ul>
+  <li><strong>Permisos</strong> <code>pages_show_list</code>, <code>pages_read_engagement</code>, <code>business_management</code>: localizar la página del propietario y la cuenta de Instagram vinculada.</li>
+  <li><strong>Permisos</strong> <code>pages_manage_posts</code>, <code>instagram_basic</code>, <code>instagram_content_publish</code>: publicar los vídeos en esa página y esa cuenta.</li>
+  <li><strong>Token de acceso de la página e identificadores</strong> de la página y de la cuenta de Instagram: para publicar sin volver a iniciar sesión.</li>
+  <li><strong>Identificador y enlace de cada publicación</strong>: para confirmar que se ha publicado.</li>
+</ul>
+<p>No lee mensajes, comentarios, seguidores ni datos de otros usuarios.</p>
+
+<h2>6. Dónde se guardan y con quién se comparten</h2>
+<p>Los datos se guardan solo en el ordenador del propietario: los tokens en <code>credenciales/youtube.json</code>, <code>credenciales/tiktok.json</code> y <code>credenciales/meta.json</code> y el historial en <code>historial.csv</code>. No hay servidores propios.</p>
 <p>No se venden, ceden ni comparten con terceros. No se usan cookies, analítica ni publicidad.</p>
 
-<h2>6. Revocar el acceso</h2>
-<p>Puedes retirar el acceso en cualquier momento desde la página de permisos de seguridad de Google: <a href="https://security.google.com/settings/security/permissions">security.google.com/settings/security/permissions</a>. En TikTok: <em>Ajustes y privacidad &gt; Seguridad &gt; Permisos de apps</em>. A partir de ese momento shorts-ia no puede subir nada.</p>
+<h2>7. Revocar el acceso</h2>
+<p>Puedes retirar el acceso en cualquier momento desde la página de permisos de seguridad de Google: <a href="https://security.google.com/settings/security/permissions">security.google.com/settings/security/permissions</a>. En TikTok: <em>Ajustes y privacidad &gt; Seguridad &gt; Permisos de apps</em>. En Facebook: <em>Configuración &gt; Integraciones comerciales</em>; en Instagram: <em>Configuración &gt; Sitios web y aplicaciones</em>. A partir de ese momento shorts-ia no puede subir nada.</p>
 
-<h2>7. Eliminación de datos</h2>
-<p>Al revocar el acceso, o si lo pides abriendo una incidencia, el token y el historial se borran del ordenador en un máximo de 7 días.</p>
+<h2 id="eliminacion">8. Eliminación de datos</h2>
+<p>Para borrar tus datos, retira el acceso como se indica arriba o abre una incidencia en GitHub (ver Contacto). Al revocar el acceso, o si lo pides abriendo una incidencia, el token y el historial se borran del ordenador en un máximo de 7 días.</p>
 <p>Los vídeos locales se borran automáticamente en cuanto cada plataforma confirma la publicación.</p>
 
-<h2>8. Contacto</h2>
+<h2>9. Contacto</h2>
 <p><a href="https://github.com/alvaro-tena/shorts-ia-legal/issues">Abre una incidencia en GitHub</a>.</p>
 </body>
 </html>
