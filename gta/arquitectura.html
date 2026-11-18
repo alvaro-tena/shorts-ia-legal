@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura · todoSobreGTA6</title>
+<link rel="stylesheet" href="../estilo.css">
+<link rel="icon" href="icono.png">
+</head>
+<body>
+<h1>Arquitectura de todoSobreGTA6</h1>
+<div class="diagrama">
+  <div class="fila">
+    <div class="caja local"><strong>Ordenador del propietario (Windows)</strong><br>Todo se ejecuta en local; no hay servidor propio.</div>
+  </div>
+  <div class="fila">
+    <div class="caja"><strong>Fuentes</strong><br>Vídeos y directos públicos de GTA 6 de streamers en YouTube y Twitch.</div>
+  </div>
+  <div class="flecha">↓</div>
+  <div class="fila">
+    <div class="caja local"><strong>gta.py</strong><br>Transcribe cada fuente, elige los mejores momentos de GTA 6 y descarga solo esos tramos.</div>
+    <div class="caja local"><strong>Montaje (ffmpeg)</strong><br>Clips verticales y resúmenes de ~12 min con subtítulos en español, narración que presenta cada parte y el creador original en la descripción.</div>
+  </div>
+  <div class="flecha">↓</div>
+  <div class="fila">
+    <div class="caja local"><strong>Cola local (<code>cola/</code>)</strong><br>Cada vídeo con su título, descripción y hora de publicación.</div>
+    <div class="caja local"><strong>Programador de tareas de Windows</strong><br>Ejecuta <code>publicar-ahora</code> a cada hora programada.</div>
+  </div>
+  <div class="flecha">↓</div>
+  <div class="fila">
+    <div class="caja local"><strong>redes.py</strong><br>Publicador oficial: obtiene un token de acceso con el token de actualización guardado en <code>credenciales/youtube.json</code>.</div>
+  </div>
+  <div class="flecha">↓ HTTPS · OAuth 2.0 (permiso <code>youtube.upload</code>)</div>
+  <div class="fila">
+    <div class="caja yt-caja"><strong>YouTube Data API v3</strong><br><code>videos.insert</code> (subida reanudable) con <code>privacyStatus=private</code> + <code>publishAt</code>.</div>
+  </div>
+  <div class="flecha">↓</div>
+  <div class="fila">
+    <div class="caja yt-caja"><strong>Canal todoSobreGTA6</strong><br>YouTube publica el vídeo a la hora indicada. Si el canal devuelto no es el del propietario, se para y no se sube nada más.</div>
+  </div>
+  <div class="flecha">↓ id del vídeo</div>
+  <div class="fila">
+    <div class="caja local"><strong>historial.csv</strong><br>Guarda el id y la URL. El vídeo local se borra al confirmarse la publicación.</div>
+  </div>
+</div>
+</body>
+</html>
