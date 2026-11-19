@@ -11,10 +11,10 @@
 <p><img src="icono.png" alt="Icono de todoSobreGTA6" width="96" height="96"></p>
 <p><a href="index.html">← todoSobreGTA6</a></p>
 <h1>Política de privacidad</h1>
-<p>Última actualización: 18 de noviembre de 2026.</p>
+<p>Última actualización: 19 de noviembre de 2026.</p>
 
 <h2>1. Qué es todoSobreGTA6</h2>
-<p>todoSobreGTA6 es un programa de escritorio personal de Álvaro Tena García. Sube clips y resúmenes de GTA 6 al canal de YouTube del propio propietario (<a href="https://www.youtube.com/channel/UCTR_mUL8YXxdQkm8scvlA4Q">todoSobreGTA6</a>) y los programa a una hora concreta.</p>
+<p>todoSobreGTA6 es un programa de escritorio personal de Álvaro Tena García. Sube clips y resúmenes de GTA 6 al canal de YouTube del propio propietario (<a href="https://www.youtube.com/channel/UCTR_mUL8YXxdQkm8scvlA4Q">todoSobreGTA6</a>) y a su cuenta de TikTok, a una hora concreta.</p>
 <p>No tiene usuarios externos ni ofrece servicio a terceros.</p>
 
 <h2>2. Uso de los servicios de API de YouTube</h2>
@@ -32,12 +32,22 @@
 </ul>
 <p>No lee comentarios, estadísticas, suscriptores ni ningún otro dato del canal o de otros usuarios.</p>
 
+<h2 id="tiktok">3b. Uso de las API de TikTok</h2>
+<p>todoSobreGTA6 usa <strong>Login Kit</strong> y la <strong>Content Posting API</strong> de TikTok (Direct Post) para publicar en la cuenta de TikTok del propietario los vídeos que él aprueba uno a uno. Al autorizar la app aceptas las <a href="https://www.tiktok.com/legal/page/global/terms-of-service/en">Condiciones del Servicio de TikTok</a> y su <a href="https://www.tiktok.com/legal/page/global/privacy-policy/en">Política de Privacidad</a>.</p>
+<ul>
+  <li><strong>Permiso</strong> <code>user.info.basic</code>: nombre visible, usuario y foto del creador, para mostrar en qué cuenta se va a publicar.</li>
+  <li><strong>Permiso</strong> <code>video.publish</code>: publicar en la cuenta del creador los vídeos que él aprueba, con la privacidad e interacciones que elige.</li>
+  <li><strong>Token de actualización OAuth e identificador abierto (open_id)</strong>: para publicar sin volver a iniciar sesión.</li>
+  <li><strong>Identificador y estado de la publicación</strong>: para confirmar que el vídeo se ha publicado.</li>
+</ul>
+<p>No lee vídeos, comentarios, seguidores, mensajes ni datos de otros usuarios.</p>
+
 <h2>4. Dónde se guardan y con quién se comparten</h2>
-<p>Los datos se guardan solo en el ordenador del propietario: el token en <code>credenciales/youtube.json</code> y el historial en <code>historial.csv</code>. No hay servidores propios.</p>
+<p>Los datos se guardan solo en el ordenador del propietario: los tokens en <code>credenciales/youtube.json</code> y <code>credenciales/tiktok.json</code> y el historial en <code>historial.csv</code>. No hay servidores propios.</p>
 <p>No se venden, ceden ni comparten con terceros. No se usan cookies, analítica ni publicidad.</p>
 
 <h2>5. Revocar el acceso</h2>
-<p>Puedes retirar el acceso en cualquier momento desde la página de permisos de seguridad de Google: <a href="https://security.google.com/settings/security/permissions">security.google.com/settings/security/permissions</a>. A partir de ese momento todoSobreGTA6 no puede subir nada.</p>
+<p>Puedes retirar el acceso en cualquier momento desde la página de permisos de seguridad de Google: <a href="https://security.google.com/settings/security/permissions">security.google.com/settings/security/permissions</a>. En TikTok: <em>Ajustes y privacidad &gt; Seguridad &gt; Permisos de apps</em>. A partir de ese momento todoSobreGTA6 no puede subir nada.</p>
 
 <h2 id="eliminacion">6. Eliminación de datos</h2>
 <p>Para borrar tus datos, retira el acceso como se indica arriba o abre una incidencia en GitHub (ver Contacto). Al revocar el acceso, o si lo pides abriendo una incidencia, el token y el historial se borran del ordenador en un máximo de 7 días.</p>
